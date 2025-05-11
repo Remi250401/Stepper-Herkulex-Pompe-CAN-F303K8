@@ -3,7 +3,6 @@
 #include <STEPPER.h>
 #include <CAN.h>
 #include <STM32FreeRTOS.h>
-#include <CONFIG_CARTE.h>
 // offset pour différencier les deux cartes MPP, avant, ou arrière
 
 #define PIN_POMPE PF0 // Pin pour la pompe
@@ -21,6 +20,8 @@ int i = 0;
 int nb_step;
 // mode fdc ou non, flag_stepper : 1 = MPP actionné, 0 = pas actionné
 bool mode_fdc, actionner = 0, flag_stepper = 0;
+
+// USED_ID USED_CAN_ID;
 
 void Gestion_STEPPER(void *parametres);
 void Gestion_CAN(void *parametres);
@@ -55,8 +56,8 @@ void setup()
     // check for creation errors
 
     // start scheduler
-    sendCANMessage(BOOT_CARTE_MPP, 1, 0, 0, 0, 0, 0, 0, 0); // signale que la carte a boot, pret à recevoir des ordres
-    vTaskStartScheduler();                                  // lance le scheduler
+    sendCANMessage(USED_CAN_ID.BOOT_CARTE_MPP, 1, 0, 0, 0, 0, 0, 0, 0); // signale que la carte a boot, pret à recevoir des ordres
+    vTaskStartScheduler();                                         // lance le scheduler
 
     // Affiche si y'a un problème de mémoire
 
@@ -118,15 +119,17 @@ void Gestion_CAN(void *parametres)
             {
                 Serial.print("msg recu 0x");
                 Serial.println(id_msg_can_rx, HEX);
-                switch (id_msg_can_rx)
+
+                if (id_msg_can_rx == USED_CAN_ID.HERKULEX_AIMANT_CENTRE)
                 {
-                case HERKULEX_AIMANT_CENTRE:
                     cmd_aimant_centre(data_msg_can_rx[0]); // met le mouvement demandé
-                    break;
-                case HERKULEX_AIMANT_COTE:
+                }
+                if (id_msg_can_rx == USED_CAN_ID.HERKULEX_AIMANT_COTE)
+                {
                     cmd_aimant_cote(data_msg_can_rx[0]); // met le mouvement demandé
-                    break;
-                case HERKULEX_PIVOT_COTE:
+                }
+                if (id_msg_can_rx == USED_CAN_ID.HERKULEX_PIVOT_COTE)
+                {
                     // met le mouvement demandé par la trame
                     if (data_msg_can_rx[0] == CENTRE)
                     {
@@ -140,22 +143,26 @@ void Gestion_CAN(void *parametres)
                     {
                         aimant_cote_ecarter();
                     }
-                    break;
-                case CMD_MPP:
+                }
+                if (id_msg_can_rx == USED_CAN_ID.CMD_MPP)
+                {
                     // nbre de pas codé sur les 4 premiers octet de la trame
                     nb_step = *((int *)&data_msg_can_rx);
                     // mode de fdc sur l'octet de 4
                     mode_fdc = data_msg_can_rx[4];
                     xTaskNotifyGive(stepper_handle); // on lance la tâche
                     Serial.println(nb_step);
-                    break;
-                case HERKULEX_PIVOT_POMPE:
+                }
+                if (id_msg_can_rx == USED_CAN_ID.HERKULEX_PIVOT_POMPE)
+                {
                     cmd_pivot_pompe(data_msg_can_rx[0]);
-                    break;
-                case LACHER:
+                }
+                if (id_msg_can_rx == USED_CAN_ID.LACHER)
+                {
                     // cmd_pince(data_msg_can_rx[0]);
-                    break;
-                case CONTRUIRE_PREPARER:
+                }
+                if (id_msg_can_rx == USED_CAN_ID.CONSTRUIRE_PREPARER)
+                {
                     restart_all_servo();
                     cmd_pivot_pompe(RETRACTER); // déploit pivot pince
                     aimant_cote_attraper();     // pivots des côtés
@@ -163,17 +170,15 @@ void Gestion_CAN(void *parametres)
                     cmd_aimant_centre(ATTRAPER);
                     cmd_aimant_cote(ATTRAPER);
                     cmd_pompe(false);
-                    break;
-                case CONSTRUIRE_2ETAGE:
+                }
+                if (id_msg_can_rx == USED_CAN_ID.CONSTRUIRE_2ETAGE)
+                {
                     /*
                         L'avantage de cette méthode c'est qu'on bouffe rien
                         En gros -> pas de mutex rien
                         On fait en quelque sorte une interruption tâche
                     */
                     xTaskNotifyGive(build_handle); // on lance la tâche
-                    break;
-                default:
-                    break;
                 }
             }
 
@@ -186,6 +191,7 @@ void Gestion_CAN(void *parametres)
                     Serial.println("Scanning...");
                     Serial.println("Addresses are displayed in hexadecimal");
                     activate_detect = true;
+                    restart_all_servo();
                 }
             }
 
@@ -205,7 +211,7 @@ void Gestion_STEPPER(void *parametres) // v1
 {
     while (1)
     {
-        /*On bloque constamment le moteur pas a pas et on*/ 
+        /*On bloque constamment le moteur pas a pas et on*/
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         stepper(nb_step, PAS_COMPLET, mode_fdc);
         blockStepper();
@@ -324,7 +330,7 @@ void build_floor2(void *)
                     building = false;
                     Serial.println("finished building");
                     cmd_pompe(false);
-                    sendCANMessage(CONSTRUIRE_TERMINEE, 0, 0, 0, 0, 0, 0, 0, 0);
+                    sendCANMessage(USED_CAN_ID.CONSTRUIRE_TERMINEE, 0, 0, 0, 0, 0, 0, 0, 0);
                 }
                 break;
             }

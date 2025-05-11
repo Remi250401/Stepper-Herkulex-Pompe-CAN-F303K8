@@ -1,5 +1,6 @@
 #include "STM32_CAN.h"
 #include <CAN.h>
+// #include "CONFIG_CARTE.h"
 
 STM32_CAN Can( CAN1, DEF );  //Use PA11/12 pins for CAN1.
 //STM32_CAN Can( CAN1, ALT );  //Use PB8/9 pins for CAN1.
@@ -11,8 +12,6 @@ STM32_CAN Can( CAN1, DEF );  //Use PA11/12 pins for CAN1.
 
 static CAN_message_t CAN_TX_msg;
 static CAN_message_t CAN_RX_msg;
-
-
 
 void setup_can(){
 
@@ -63,31 +62,31 @@ char receiveCANMessage(int *id, char *adresse_tableau_data){
 // filtre le message, retourne 1 si msg pour nous
 bool msg_for_me(int id_msg_rx){
     // msg pour nous, ceux de la carte avant si configuré en carte avant, carte arriere sinon
-    if(id_msg_rx == HERKULEX_AIMANT_CENTRE){
+    if(id_msg_rx == USED_CAN_ID.HERKULEX_AIMANT_CENTRE){
         return 1;
     }
-    if(id_msg_rx == HERKULEX_AIMANT_COTE){
+    if(id_msg_rx == USED_CAN_ID.HERKULEX_AIMANT_COTE){
         return 1;
     }
-    if(id_msg_rx == HERKULEX_PIVOT_COTE){
+    if(id_msg_rx == USED_CAN_ID.HERKULEX_PIVOT_COTE){
         return 1;
     }
-    if(id_msg_rx == CMD_MPP){
+    if(id_msg_rx == USED_CAN_ID.CMD_MPP){
         return 1;
     }
-    if(id_msg_rx == HERKULEX_PIVOT_POMPE){
+    if(id_msg_rx == USED_CAN_ID.HERKULEX_PIVOT_POMPE){
         return 1;
     }
-    if(id_msg_rx == LACHER){
+    if(id_msg_rx == USED_CAN_ID.LACHER){
         return 1;
     }
-    if(id_msg_rx == CONSTRUIRE_AVANT_PREPARER){
+    if(id_msg_rx == USED_CAN_ID.CONSTRUIRE_PREPARER){
         return 1;
     }
-    if(id_msg_rx == CONSTRUIRE_2ETAGE){
+    if(id_msg_rx == USED_CAN_ID.CONSTRUIRE_2ETAGE){
         return 1;
     }
-    if(id_msg_rx == CONSTRUIRE_AVANT_TERMINEE){
+    if(id_msg_rx == USED_CAN_ID.CONSTRUIRE_TERMINEE){
         return 1;
     }
 

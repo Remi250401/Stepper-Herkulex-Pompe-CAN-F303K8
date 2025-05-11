@@ -30,7 +30,7 @@
 
 
 
-
+void change_id(uint8_t id, HerkulexServo old_, HerkulexServo new_);
 void init_serial_1_for_herkulex();
 void test_herkulex();
 void test_connexion();

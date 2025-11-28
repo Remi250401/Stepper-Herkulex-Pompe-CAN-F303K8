@@ -9,7 +9,7 @@
 #define SERVO_SERRAGE 0x04
 #define SERVO_ROTATION 0x06
 
-#define ATTRAPE 340 //350
+#define ATTRAPE 330//350
 #define RELACHE 680
 #define ANGLE0 276
 #define ANGLE90 552

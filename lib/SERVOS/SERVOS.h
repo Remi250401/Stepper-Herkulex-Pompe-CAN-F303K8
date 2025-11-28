@@ -10,7 +10,7 @@
 #define SERVO_ROTATION 0x06
 
 #define ATTRAPE 340 //350
-#define RELACHE 800
+#define RELACHE 680
 #define ANGLE0 276
 #define ANGLE90 552
 #define ANGLE180 829

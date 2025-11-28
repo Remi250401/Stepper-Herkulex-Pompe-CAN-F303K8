@@ -30,14 +30,14 @@ void init_serial_1_for_herkulex()
 
 void serrer(void)
 {
-  servo_serr.setPosition(ATTRAPE, 50, HerkulexLed::Green); // Ouvre la pince
+  servo_serr.setPosition(ATTRAPE, 70, HerkulexLed::Green); // Ouvre la pince
   herkulex_bus.executeMove();
   delay(200); // Attente de 225 ms
 }
 
 void desserrer(void)
 {
-  servo_serr.setPosition(RELACHE, 50, HerkulexLed::Blue); // Ouvre la pince
+  servo_serr.setPosition(RELACHE, 70, HerkulexLed::Blue); // Ouvre la pince
   herkulex_bus.executeMove();
   delay(200); // Attente de 225 ms
 }
@@ -47,11 +47,11 @@ void tourner(void)
   switch(etat_rota)
   {
     case 0:
-      servo_rota.setPosition(ANGLE0, 50, HerkulexLed::Green); // Position 0°
+      servo_rota.setPosition(ANGLE0, 70, HerkulexLed::Green); // Position 0°
       etat_rota = 1;
       break;
     case 1:
-      servo_rota.setPosition(ANGLE180, 50, HerkulexLed::Blue); // Position 90°
+      servo_rota.setPosition(ANGLE180, 70, HerkulexLed::Blue); // Position 90°
       etat_rota = 0;
       break;
     /*case 2:

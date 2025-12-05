@@ -8,7 +8,9 @@ HerkulexServoBus herkulex_bus(Serial1);
 
 HerkulexServo all_servo(herkulex_bus, HERKULEX_BROADCAST_ID);
 HerkulexServo servo_rota(herkulex_bus, SERVO_ROTATION);
+HerkulexServo servo_rota2(herkulex_bus, SERVO_ROTATION2);
 HerkulexServo servo_serr(herkulex_bus, SERVO_SERRAGE);
+HerkulexServo servo_serr2(herkulex_bus, SERVO_SERRAGE2);
 
 
 // Variables pour gérer l'intervalle de mise à jour
@@ -16,6 +18,7 @@ unsigned long last_update = 0; // Stocke le temps de la dernière mise à jour
 unsigned long now = 0;         // Stocke le temps actuel
 bool toggle = false;           // Booléen pour alterner entre deux positions
 char etat_rota=0;              // État actuel de la rotation du servo (0 -> 0°, 1 -> 90°, 2 -> 180°)
+char etat_rota2=0; 
 
 // Variables pour la position du servo
 int pos, pos_angle;
@@ -34,10 +37,22 @@ void serrer(void)
   herkulex_bus.executeMove();
   delay(200); // Attente de 225 ms
 }
+void serrer2(void)
+{
+  servo_serr2.setPosition(ATTRAPE2, 70, HerkulexLed::Green); // Ouvre la pince
+  herkulex_bus.executeMove();
+  delay(200); // Attente de 225 ms
+}
 
 void desserrer(void)
 {
   servo_serr.setPosition(RELACHE, 70, HerkulexLed::Blue); // Ouvre la pince
+  herkulex_bus.executeMove();
+  delay(200); // Attente de 225 ms
+}
+void desserrer2(void)
+{
+  servo_serr2.setPosition(RELACHE2, 70, HerkulexLed::Blue); // Ouvre la pince
   herkulex_bus.executeMove();
   delay(200); // Attente de 225 ms
 }
@@ -54,14 +69,21 @@ void tourner(void)
       servo_rota.setPosition(ANGLE180, 70, HerkulexLed::Blue); // Position 90°
       etat_rota = 0;
       break;
-    /*case 2:
-      servo_rota.setPosition(ANGLE180, 50, HerkulexLed::Red); // Position 180°
-      etat_rota = 3;
+  }
+}
+
+void tourner2(void)
+{
+  switch(etat_rota2)
+  {
+    case 0:
+      servo_rota2.setPosition(ANGLE180, 70, HerkulexLed::Green); // Position 0°
+      etat_rota2 = 1;
       break;
-    case 3:
-      servo_rota.setPosition(ANGLE90, 50, HerkulexLed::Red); // Position 180°
-      etat_rota = 0;
-      break;*/
+    case 1:
+      servo_rota2.setPosition(ANGLE0, 70, HerkulexLed::Blue); // Position 90°
+      etat_rota2 = 0;
+      break;
   }
 }
 

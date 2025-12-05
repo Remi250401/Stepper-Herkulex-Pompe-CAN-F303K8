@@ -8,16 +8,24 @@
 #define HERKULEX_BROADCAST_ID 0xFE
 #define SERVO_SERRAGE 0x04
 #define SERVO_ROTATION 0x06
+#define SERVO_SERRAGE2 0x0A
+#define SERVO_ROTATION2 0x08
 
-#define ATTRAPE 330//350
-#define RELACHE 680
+
+
+
+#define ATTRAPE 550//valeur reseeré(augmenter pour serrer+ valeur ref : 550 )
+#define RELACHE 400//valeur relachée(diminuer pour relacher +) ref : 420
+#define ATTRAPE2 400
+#define RELACHE2 550
 #define ANGLE0 276
 #define ANGLE90 552
 #define ANGLE180 829
-
 // Broches série
 #define PIN_SW_RX PB7
 #define PIN_SW_TX PB6
+
+
 
 // Déclarations extern des objets définis dans SERVOS.cpp
 extern HardwareSerial Serial1;
@@ -26,10 +34,14 @@ extern HerkulexServo all_servo;
 extern HerkulexServo servo_rota;
 extern HerkulexServo servo_serr;
 
+
 // Prototypes de fonctions
 void serrer(void);
 void desserrer(void);
 void tourner(void);
+void serrer2(void);
+void desserrer2(void);
+void tourner2(void);
 
 void change_id(uint8_t id, HerkulexServo old_, HerkulexServo new_);
 void init_serial_1_for_herkulex();
